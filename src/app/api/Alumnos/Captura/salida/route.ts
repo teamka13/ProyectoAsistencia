@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { NotificacionEntradaTG } from "@/app/api/bot/mensajes/entrada/route";
+import { NotificacionSalidaTG } from "@/app/api/bot/mensajes/salida/route";
 import { sendErrorResponse } from "@/lib/errorResponse";
 import { getConnection } from "@/lib/dbMssql"; // Asegúrate de que la ruta sea correcta
 import sql from "mssql";
@@ -22,14 +22,14 @@ export async function GET(req: NextRequest) {
     const result = await pool
       .request()
       .input("Matricula", sql.VarChar(12), Matricula)
-      .execute("spBM");
+      .execute("spBMS");
 
     if (!result.recordset[0]) {
       return sendErrorResponse("INVALID", 422);
     }
 
     const query = result.recordset[0];
-    console.log("Datos de Entrada enviados");
+    console.log("Datos de Salida enviados");
 
     if (query.CodigoError === 1) {
       return sendErrorResponse("SINREGISTRO", 409);
@@ -37,26 +37,31 @@ export async function GET(req: NextRequest) {
     if (query.CodigoError === 2) {
       return sendErrorResponse("SEGUNDOREGISTRO", 404);
     }
+    if (query.CodigoError === 3) {
+      console.log("No se encontró registro de entrada");
+      return sendErrorResponse("SINENTRADA", 401);
+    }
 
-    const horaEntradaQuery = query.Hora;
-    const horaLimite = new Date();
-    horaLimite.setHours(18, 0, 0, 0);
+    const horaSalidaQuery = query.Hora;
+    const horaSalidaEsperada = new Date();
+    horaSalidaEsperada.setHours(19, 0, 0, 0);
 
-    const horaEntrada = new Date();
-    const [h, m] = horaEntradaQuery.split(":").map(Number);
-    horaEntrada.setHours(h, m, 0, 0);
+    const horaSalidaReal = new Date();
+    const [h, m] = horaSalidaQuery.split(":").map(Number);
+    horaSalidaReal.setHours(h, m, 0, 0);
 
-    const esTarde = horaEntrada > horaLimite;
-    const estado = esTarde ? "T" : "AT";
+    const salidaTemprano = horaSalidaReal < horaSalidaEsperada; // corregido
+    const estado = salidaTemprano ? "ANTES" : "DESPUES";
 
-    const msRetraso = horaEntrada.getTime() - horaLimite.getTime();
-    let Retraso = "0 min";
+    const msDiferencia =
+      horaSalidaEsperada.getTime() - horaSalidaReal.getTime();
+    let anticipacion = "0 min";
 
-    if (msRetraso > 0) {
-      const totalMinutos = Math.floor(msRetraso / 60000);
-      const horas = Math.floor(totalMinutos / 60);
-      const minutos = totalMinutos % 60;
-      Retraso =
+    if (salidaTemprano && msDiferencia > 0) {
+      const totalMin = Math.floor(msDiferencia / 60000);
+      const horas = Math.floor(totalMin / 60);
+      const minutos = totalMin % 60;
+      anticipacion =
         horas > 0
           ? `${horas} hora${horas > 1 ? "s" : ""} ${minutos} min`
           : `${minutos} min`;
@@ -65,12 +70,12 @@ export async function GET(req: NextRequest) {
     const responseData = {
       ...query,
       estado,
-      Retraso,
+      anticipacion,
     };
 
     if (query.Tel) {
       console.log("Datos Siendo Procesados por telegram");
-      NotificacionEntradaTG({
+      NotificacionSalidaTG({
         Tel: query.Tel,
         nombre: query.Nombre,
         paterno: query.Paterno,

@@ -123,7 +123,7 @@ export function Consult() {
         <div className="flex items-center">
           <Search className="text-indigo-600 mr-3 h-6 w-6" />
           <h1 className="text-2xl font-bold text-indigo-800">
-            Búsqueda General de Alumnos
+            Búsqueda General del Personal
           </h1>
         </div>
       </div>

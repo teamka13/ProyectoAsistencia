@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { executeRequest } from "@/lib/dbMssql";
+import { getConnection } from "@/lib/dbMssql";
 import { sendErrorResponse } from "@/lib/errorResponse";
-import sql from "mssql";
 
 export async function POST(request: Request) {
   try {
@@ -34,25 +33,30 @@ export async function POST(request: Request) {
       return sendErrorResponse("INVALID", 422);
     }
 
-    // Ejecutar el stored procedure
-    const result = await executeRequest("procedure", "spRP", {
-      IdGrupo: { type: sql.Int, value: gpo },
-      IdSexo: { type: sql.Int, value: sexo },
-      Plantel: { type: sql.Int, value: plantel },
-      Estado: { type: sql.Int, value: estado },
-      IdPersonal: { type: sql.Int, value: tipo },
-      ApPaterno: { type: sql.VarChar(70), value: patern?.toUpperCase() },
-      ApMaterno: { type: sql.VarChar(70), value: matern?.toUpperCase() },
-      Nombre: { type: sql.VarChar(50), value: nombre.toUpperCase() },
-      Matricula: { type: sql.Char(12), value: matricula.toUpperCase() },
-      CURP: { type: sql.Char(18), value: curp.toUpperCase() },
-      NumeroTel: { type: sql.Char(12), value: tel },
-      NSS: { type: sql.Char(11), value: nss },
-    });
+    const pool = await getConnection();
+    const requestDb = pool.request();
+
+    // Agregar parámetros (sin especificar tipo explícitamente)
+    if (gpo !== undefined) requestDb.input("IdGrupo", gpo);
+    if (sexo !== undefined) requestDb.input("IdSexo", sexo);
+    if (plantel !== undefined) requestDb.input("Plantel", plantel);
+    if (estado !== undefined) requestDb.input("Estado", estado);
+    if (tipo !== undefined) requestDb.input("IdPersonal", tipo);
+    if (patern !== undefined)
+      requestDb.input("ApPaterno", patern.toUpperCase());
+    if (matern !== undefined)
+      requestDb.input("ApMaterno", matern.toUpperCase());
+    if (nombre !== undefined) requestDb.input("Nombre", nombre.toUpperCase());
+    if (matricula !== undefined)
+      requestDb.input("Matricula", matricula.toUpperCase());
+    if (curp !== undefined) requestDb.input("CURP", curp.toUpperCase());
+    if (tel !== undefined) requestDb.input("NumeroTel", tel);
+    if (nss !== undefined) requestDb.input("NSS", nss);
+
+    const result = await requestDb.execute("spRP");
 
     console.log("Datos enviados al sp");
 
-    // Validar respuesta
     if (!result.recordset[0]) {
       console.log("No se recibieron datos del SP");
       return sendErrorResponse("error", 422);
@@ -60,7 +64,6 @@ export async function POST(request: Request) {
 
     const query = result.recordset[0];
 
-    // Manejo de respuestas del SP
     if (query.SUSCCESFULL === 1) {
       console.log("Registro exitoso");
       return NextResponse.json({ success: true }, { status: 200 });

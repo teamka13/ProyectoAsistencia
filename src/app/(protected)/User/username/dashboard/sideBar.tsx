@@ -1,119 +1,155 @@
 import {
-  FaClipboardList,
-  FaUserEdit,
-  FaCalendarDay,
-  FaCalendarAlt,
-  FaUtensils,
-  FaUserGraduate,
-  FaSearch,
-  FaUserPlus,
-  FaBookOpen,
-  FaBug,
-} from "react-icons/fa";
-
-import { IoHelpBuoyOutline } from "react-icons/io5";
-import { HiOutlineLogout } from "react-icons/hi";
+  ClipboardList,
+  UserCog,
+  CalendarDays,
+  CalendarCheck,
+  Utensils,
+  GraduationCap,
+  Search,
+  UserPlus,
+  BookOpen,
+  Bug,
+  HelpCircle,
+  LogOut,
+  ArrowRight,
+  LogIn,
+  Send,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 export const menuItems = [
   {
     id: "registro",
-    icon: <FaUserEdit size={30} />,
+    icon: <UserCog size={30} />,
     label: "Registro de asistencia",
     subMenu: [
       {
         label: "Captura Entrada",
         path: "Captura/Entrada",
-        icon: <FaCalendarDay />,
+        icon: <CalendarDays size={20} />,
       },
       {
         label: "Captura Comedor",
         path: "Captura/Comedor",
-        icon: <FaUtensils />,
+        icon: <Utensils size={20} />,
+      },
+      {
+        label: "Captura Salida",
+        path: "Captura/Salida",
+        icon: <ArrowRight size={20} />,
       },
     ],
   },
   {
     id: "alumns",
-    icon: <FaUserGraduate size={30} />,
-    label: "Estudiantes",
+    icon: <GraduationCap size={30} />,
+    label: "Personal y Alumnos",
     subMenu: [
       {
-        label: "Buscar alumno",
+        label: "Buscaqueda de Personal",
         path: "Alumnos/Buscar",
-        icon: <FaSearch />,
+        icon: <Search size={20} />,
       },
       {
         label: "Registrar Alumnos",
         path: "Alumnos/Registrar",
-        icon: <FaUserPlus />,
+        icon: <UserPlus size={20} />,
       },
     ],
   },
   {
     id: "reportesAsistencia",
-    icon: <FaClipboardList size={30} />,
+    icon: <ClipboardList size={30} />,
     label: "Reportes Asistencia",
     subMenu: [
       {
         label: "Asistencia Diaria",
         path: "Asistencia/Diario",
-        icon: <FaCalendarDay />,
+        icon: <CalendarDays size={20} />,
       },
       {
         label: "Asistencia Mensual",
         path: "Asistencia/Mes",
-        icon: <FaCalendarAlt />,
+        icon: <CalendarCheck size={20} />,
       },
     ],
   },
   {
     id: "reportesSalida",
-    icon: <HiOutlineLogout size={30} />,
+    icon: <LogOut size={30} />,
     label: "Reportes de Salida",
     subMenu: [
       {
         label: "Salida Diaria",
         path: "Salida/Diario",
-        icon: <FaCalendarDay />,
+        icon: <CalendarDays size={20} />,
       },
       {
         label: "Salida Mensual",
         path: "Salida/Mes",
-        icon: <FaCalendarAlt />,
+        icon: <CalendarCheck size={20} />,
       },
     ],
   },
   {
     id: "reportesComedor",
-    icon: <FaUtensils size={30} />,
+    icon: <Utensils size={30} />,
     label: "Reportes de Comedor",
     subMenu: [
       {
         label: "Comedor Diario",
         path: "Comedor/Diario",
-        icon: <FaCalendarDay />,
+        icon: <CalendarDays size={20} />,
       },
       {
         label: "Comedor Mensual",
         path: "Comedor/Mes",
-        icon: <FaCalendarAlt />,
+        icon: <CalendarCheck size={20} />,
       },
     ],
   },
   {
     id: "soporte",
-    icon: <IoHelpBuoyOutline size={30} />,
+    icon: <HelpCircle size={30} />,
     label: "Ayuda y soporte",
     subMenu: [
       {
         label: "Manual de Usuario",
         path: "support/usersManual",
-        icon: <FaBookOpen />,
+        icon: <BookOpen size={20} />,
       },
       {
         label: "Formulario de Reporte",
         path: "support/formReport",
-        icon: <FaBug />,
+        icon: <Bug size={20} />,
+      },
+    ],
+  },
+  {
+    id: "telegram",
+    icon: <Send size={30} />,
+    label: "Telegram Mensajes",
+    subMenu: [
+      {
+        label: "Notificar Entrada",
+        path: "telegram/entrada",
+        icon: <LogIn size={20} />,
+      },
+      {
+        label: "Notificar Salida",
+        path: "telegram/salida",
+        icon: <LogOut size={20} />,
+      },
+      {
+        label: "Ausencia Detectada",
+        path: "telegram/noAsistio",
+        icon: <XCircle size={20} />,
+      },
+      {
+        label: "Salida No Registrada",
+        path: "telegram/sinSalida",
+        icon: <AlertTriangle size={20} />,
       },
     ],
   },

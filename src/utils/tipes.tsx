@@ -34,6 +34,7 @@ export type PropsQuery = {
   Hora: string;
   Retraso?: string;
   estado?: string;
+  anticipacion?: string;
 };
 export type PropsQueryComedor = {
   Matricula: string;

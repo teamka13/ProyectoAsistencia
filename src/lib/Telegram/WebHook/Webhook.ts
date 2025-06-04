@@ -13,7 +13,7 @@ export async function configurarWebhook() {
       {
         url: WEBHOOK_URL,
         drop_pending_updates: true,
-        allowed_updates: ["message", "callback_query"],
+        allowed_updates: JSON.stringify(["message", "callback_query"]),
         max_connections: 40,
       }
     );

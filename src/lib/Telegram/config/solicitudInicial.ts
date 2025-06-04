@@ -5,28 +5,34 @@ export async function solicitudInicial(options: {
   chat_id: string;
   text: string;
   requestContact?: boolean;
+  removeKeyboard?: boolean;
 }) {
   try {
-    const payload = {
+    const payload: any = {
       chat_id: options.chat_id,
       text: options.requestContact
         ? "¡Hola! 👋 Para continuar, debemos de capturar su número telefónico:"
         : options.text,
-      reply_markup: options.requestContact
-        ? {
-            keyboard: [
-              [
-                {
-                  text: "📱 Compartir mi número",
-                  request_contact: true,
-                },
-              ],
-            ],
-            resize_keyboard: true,
-            one_time_keyboard: true,
-          }
-        : undefined,
     };
+
+    if (options.requestContact) {
+      payload.reply_markup = {
+        keyboard: [
+          [
+            {
+              text: "📱 Compartir mi número",
+              request_contact: true,
+            },
+          ],
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: true,
+      };
+    } else if (options.removeKeyboard) {
+      payload.reply_markup = {
+        remove_keyboard: true,
+      };
+    }
 
     const res = await axios.post(`${BASE_URL}/sendMessage`, payload);
     return res.data;

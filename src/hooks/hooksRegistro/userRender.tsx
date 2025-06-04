@@ -6,9 +6,12 @@ import {
   MatriculaNoEncontrada,
   RegistroComedor,
   RegistroExitoso,
-  NoValido,
+  INVALID,
   Error,
   SinAsistencia,
+  SalidaAnticipada,
+  SalidaExitosa,
+  YaRegistradoSalida,
 } from "@/components/ui/tiposEntrada";
 
 export function RenderEntrada(
@@ -28,8 +31,8 @@ export function RenderEntrada(
       return <MatriculaNoEncontrada />;
     case "Error":
       return <Error />;
-    case "NOTVALID":
-      return <NoValido />;
+    case "INVALID":
+      return <INVALID />;
     default:
       return <ErrorDesconocido />;
   }
@@ -48,13 +51,49 @@ export function RenderComedor(
     case "C":
       return <RegistroComedor {...datosQuery!} />;
     case "SINENTRADA":
-      return <SinAsistencia />;
+      return (
+        <SinAsistencia
+          Nombre={datosQuery?.Nombre}
+          Paterno={datosQuery?.Paterno}
+        />
+      );
     case "SINREGISTRO":
       return <MatriculaNoEncontrada />;
     case "Error":
       return <Error />;
-    case "NOTVALID":
-      return <NoValido />;
+    case "INVALID":
+      return <INVALID />;
+    default:
+      return <ErrorDesconocido />;
+  }
+}
+
+export function RenderSalida(
+  estado: string | null,
+  datosQuery: PropsQuery | null
+): React.ReactElement | null {
+  if (!estado) return null;
+
+  switch (estado) {
+    case "DESPUES":
+      return datosQuery ? <SalidaExitosa {...datosQuery} /> : null;
+    case "ANTES":
+      return datosQuery ? <SalidaAnticipada {...datosQuery} /> : null;
+    case "SEGUNDOREGISTRO":
+      return <YaRegistradoSalida />;
+    case "SINREGISTRO":
+      return <MatriculaNoEncontrada />;
+    case "SINENTRADA":
+      return (
+        <SinAsistencia
+          Nombre={datosQuery?.Nombre}
+          Paterno={datosQuery?.Paterno}
+        />
+      );
+    case "Error":
+      return <Error />;
+    case "INVALID":
+      return <INVALID />;
     default:
       return <ErrorDesconocido />;
   }

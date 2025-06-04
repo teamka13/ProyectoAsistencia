@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { executeRequest } from "@/lib/dbMssql";
-import sql from "mssql";
+import { getConnection } from "@/lib/dbMssql";
 
 export async function POST(request: Request) {
   try {
     const { idMes, anio, idGrupo } = await request.json();
+
     if (!idMes || !anio || !idGrupo) {
       return NextResponse.json(
         { error: "Faltan parámetros requeridos" },
@@ -12,26 +12,21 @@ export async function POST(request: Request) {
       );
     }
 
-    try {
-      const result = await executeRequest("procedure", "spRSM", {
-        IdMes: { type: sql.Int, value: idMes },
-        Anio: { type: sql.Int, value: anio },
-        IdGrupo: { type: sql.Int, value: idGrupo },
-      });
+    const pool = await getConnection();
+    const req = pool.request();
 
-      console.log(result.recordset);
-      return NextResponse.json(result.recordset);
-    } catch (err) {
-      console.error("Error en API reporte-diario-asistencia:", err);
-      return NextResponse.json(
-        { error: "Error al obtener el reporte de asistencia" },
-        { status: 500 }
-      );
-    }
+    req.input("IdMes", idMes);
+    req.input("Anio", anio);
+    req.input("IdGrupo", idGrupo);
+
+    const result = await req.execute("spRSM");
+
+    console.log(result.recordset);
+    return NextResponse.json(result.recordset);
   } catch (err) {
-    console.error("Error general en API:", err);
+    console.error("Error en API reporte-diario-asistencia:", err);
     return NextResponse.json(
-      { error: "Error inesperado en el servidor" },
+      { error: "Error al obtener el reporte de asistencia" },
       { status: 500 }
     );
   }

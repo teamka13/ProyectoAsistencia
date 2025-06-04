@@ -1,5 +1,6 @@
+// app/api/reporte-diario-asistencia/route.ts
 import { NextResponse } from "next/server";
-import { executeRequest } from "@/lib/dbMssql"; // Usa la función mejorada
+import { getConnection } from "@/lib/dbMssql"; // Asegúrate de que la ruta sea correcta
 import sql from "mssql";
 
 export async function POST(request: Request) {
@@ -13,12 +14,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await executeRequest("procedure", "spRAD", {
-      IdMes: { type: sql.Int, value: idMes },
-      Anio: { type: sql.Int, value: anio },
-      Dia: { type: sql.Int, value: dia },
-      IdGrupo: { type: sql.Int, value: idGrupo },
-    });
+    const pool = await getConnection();
+    const result = await pool
+      .request()
+      .input("IdMes", sql.Int, idMes)
+      .input("Anio", sql.Int, anio)
+      .input("Dia", sql.Int, dia)
+      .input("IdGrupo", sql.Int, idGrupo)
+      .execute("spRAD");
 
     console.log("Datos Asistencia Grupo Enviados");
     return NextResponse.json(result.recordset);

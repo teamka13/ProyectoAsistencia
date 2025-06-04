@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { executeRequest } from "@/lib/dbMssql";
+import { getConnection } from "@/lib/dbMssql"; // Asegúrate de que la ruta sea correcta
 import sql from "mssql";
 
 function sendErrorResponse(errorMessage: string, statusCode: number) {
@@ -17,13 +17,18 @@ export async function GET(req: NextRequest) {
       Matricula.length > 12 ||
       Matricula.length < 6
     ) {
+      console.error("Arreglo no cumple lo minimo:");
       return sendErrorResponse("INVALID", 422);
     }
 
-    const result = await executeRequest("procedure", "spBMC", {
-      Matricula: { type: sql.VarChar(12), value: Matricula },
-    });
+    const pool = await getConnection();
+    const result = await pool
+      .request()
+      .input("Matricula", sql.VarChar(12), Matricula)
+      .execute("spBMC");
+
     if (!result.recordset[0]) {
+      console.error("Arreglo Vacio:");
       return sendErrorResponse("INVALID", 422);
     }
 

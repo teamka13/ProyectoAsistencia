@@ -1,6 +1,6 @@
 // lib/Telegram/notifications.ts
 import sql from "mssql";
-import { getConnection, closeConnection } from "@/lib/dbMssql";
+import { getConnection } from "@/lib/dbMssql";
 import axios from "axios";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -15,12 +15,11 @@ interface NotificacionParams {
 }
 
 export async function NotificacionEntradaTG(params: NotificacionParams) {
-  let pool;
   try {
     const { Tel, nombre, paterno, semestre, hora } = params;
 
     // 1. Obtener conexión
-    pool = await getConnection();
+    const pool = await getConnection();
 
     // 2. Buscar telegram_id en la base de datos
     const telegramResult = await pool
@@ -45,7 +44,7 @@ export async function NotificacionEntradaTG(params: NotificacionParams) {
     const mensaje =
       `📢 *Registro de Entrada*\n\n` +
       `Por este medio se le informa que su hijo(a) *${nombre} ${paterno}*,\n` +
-      `del semestre *${semestre}*, ha registrado su entrada el día\n` +
+      `del semestre *${semestre}*, ha registrado su entrada el día ` +
       `*${fecha}* a las *${hora}* horas.\n\n` +
       `_Este mensaje es generado automáticamente por el Sistema de Registro Institucional_`;
 
@@ -59,8 +58,5 @@ export async function NotificacionEntradaTG(params: NotificacionParams) {
     console.log("Notificación enviada correctamente a Telegram");
   } catch (error) {
     console.error("Error en notificación Telegram:", error);
-    // Puedes agregar aquí lógica de reintento si lo deseas
-  } finally {
-    if (pool) await closeConnection();
   }
 }
