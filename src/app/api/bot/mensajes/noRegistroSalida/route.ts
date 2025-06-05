@@ -6,15 +6,15 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 interface NotificacionParams {
-  pool: sql.ConnectionPool;
   Tel: string;
   nombre: string;
   paterno: string;
   semestre: string;
-  hora: string;
 }
 
-export async function NotificacionNoRegistroTG(params: NotificacionParams) {
+export async function NotificacionNoRegistroSalidaTG(
+  params: NotificacionParams
+) {
   try {
     const { Tel, nombre, paterno, semestre } = params;
     // 1. Obtener conexión
@@ -39,14 +39,19 @@ export async function NotificacionNoRegistroTG(params: NotificacionParams) {
     const fecha = new Intl.DateTimeFormat("es-MX", {
       dateStyle: "full",
     }).format(new Date());
-    const mensaje =
-      `🚨 *Salida No Registrada*\n\n` +
-      `Por este medio se le informa que su hijo(a) *${nombre} ${paterno}*,\n` +
-      `del semestre *${semestre}*, *no ha registrado su salida* del plantel el día\n` +
-      `*${fecha}*.\n\n` +
-      `Le sugerimos confirmar esta situación directamente con el alumno.\n\n` +
-      `_Este mensaje es generado automáticamente por el Sistema de Registro Institucional_`;
+    const mensaje = `
+⚠️  *ALERTA: SALIDA NO REGISTRADA*  ⚠️
+━━━━━━━━━━━━━━━━━━
+👤  *Alumno:* ${nombre} ${paterno}
 
+📚  *Semestre:* ${semestre}
+
+📅  *Fecha:* ${fecha}
+━━━━━━━━━━━━━━━━━━
+🔍  *Acción requerida:*
+Verificar con el alumno el motivo de la salida no registrada
+
+_Notificación automática - Sistema de Registro Institucional_ 🇲🇽`;
     // 4. Enviar mensaje a Telegram
     await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
       chat_id: telegram_id,

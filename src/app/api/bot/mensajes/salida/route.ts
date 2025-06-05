@@ -37,12 +37,18 @@ export async function NotificacionSalidaTG(params: NotificacionParams) {
     const fecha = new Intl.DateTimeFormat("es-MX", {
       dateStyle: "full",
     }).format(new Date());
-    const mensaje =
-      `📢 *Registro de Salida*\n\n` +
-      `Por este medio se le informa que su hijo(a) *${nombre} ${paterno}*,\n` +
-      `del semestre *${semestre}*, ha registrado su salida del plantel el día\n` +
-      `*${fecha}* a las *${hora}* horas.\n\n` +
-      `_Este mensaje es generado automáticamente por el Sistema de Registro Institucional_`;
+    const mensaje = `
+✅☑️   📌 *SALIDA REGISTRADA* 📌  ☑️✅
+━━━━━━━━━━━━━━━━━━
+👤  *Alumno:* ${nombre} ${paterno}
+
+📚  *Semestre:* ${semestre}
+
+📅  *Fecha:* ${fecha}
+
+⏰  *Hora de salida:* ${hora}
+━━━━━━━━━━━━━━━━━━
+_Notificación automática - Sistema de Registro Institucional_ 🇲🇽`;
 
     // 4. Enviar mensaje a Telegram
     await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
